@@ -1,11 +1,34 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import feedparser
+from newspaper import Article
 
 
 USER_AGENT = "jornal-nutri/0.1"
+HTML_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _clean_text(text: str) -> str:
+    text = HTML_TAG_RE.sub(" ", text)
+    text = text.replace("\xa0", " ")
+    return " ".join(text.split())
+
+
+def _extract_full_article_text(url: str) -> str:
+    try:
+        article = Article(url=url, browser_user_agent=USER_AGENT)
+        article.download()
+        article.parse()
+        extracted = _clean_text(article.text or "")
+        if len(extracted) >= 600:
+            return extracted
+    except Exception:
+        return ""
+
+    return ""
 
 
 def fetch_feed_entries(feed_url: str) -> list[dict[str, Any]]:
@@ -19,9 +42,14 @@ def fetch_feed_entries(feed_url: str) -> list[dict[str, Any]]:
 
         content = ""
         if hasattr(entry, "summary"):
-            content = str(entry.summary).strip()
+            content = _clean_text(str(entry.summary).strip())
         elif hasattr(entry, "description"):
-            content = str(entry.description).strip()
+            content = _clean_text(str(entry.description).strip())
+
+        url = str(getattr(entry, "link", "")).strip()
+        full_content = _extract_full_article_text(url) if url else ""
+        if full_content:
+            content = full_content
 
         if not content:
             content = title
@@ -29,7 +57,7 @@ def fetch_feed_entries(feed_url: str) -> list[dict[str, Any]]:
         entries.append(
             {
                 "source": parsed.feed.get("title", "rss") if hasattr(parsed, "feed") else "rss",
-                "url": str(getattr(entry, "link", "")).strip(),
+                "url": url,
                 "title": title,
                 "content": content,
                 "published_at": str(getattr(entry, "published", "")).strip() or None,

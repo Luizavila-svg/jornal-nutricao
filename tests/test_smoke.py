@@ -70,6 +70,7 @@ def test_collect_and_list_news(monkeypatch) -> None:
     client = TestClient(app)
 
     monkeypatch.setattr("app.main.get_feed_urls", lambda: ["https://fake.feed/rss"])
+    monkeypatch.setattr("app.collector._extract_full_article_text", lambda _url: "")
     monkeypatch.setattr(
         "app.main.fetch_feed_entries",
         lambda _url: [
@@ -147,6 +148,7 @@ def test_news_pagination_search_and_count(monkeypatch) -> None:
         "app.main.get_feed_urls",
         lambda: ["https://fake.feed/rss", "https://fake.feed2/rss"],
     )
+    monkeypatch.setattr("app.collector._extract_full_article_text", lambda _url: "")
     monkeypatch.setattr(
         "app.main.fetch_feed_entries",
         lambda _url: [

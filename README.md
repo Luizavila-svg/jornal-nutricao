@@ -6,6 +6,7 @@ Projeto reiniciado do zero para coleta e publicação de notícias da área de n
 
 - Todo texto recebido é traduzido para português.
 - O conteúdo é resumido com foco nos dados mais relevantes, em geral entre 15 e 20 linhas (quando houver conteúdo suficiente).
+- Na coleta por RSS, o sistema tenta extrair o texto completo da matéria pelo link para gerar resumos mais ricos.
 - Blocos gráficos são preservados no resumo (ex.: markdown de imagem e blocos `mermaid`).
 - Classificação automática por tema: `clinica`, `esportiva`, `emagrecimento` ou `geral`.
 - Score de relevância calculado em escala de 0 a 100.
