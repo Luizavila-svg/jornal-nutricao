@@ -1,0 +1,157 @@
+:root {
+  --bg: #f4efe5;
+  --ink: #142019;
+  --brand: #2b6a4a;
+  --brand-soft: #d7ebdd;
+  --card: #fffaf2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top right, #e8f7ee 0%, var(--bg) 48%, #f7efe0 100%);
+  color: var(--ink);
+}
+
+.page {
+  width: min(1040px, 92vw);
+  margin: 2rem auto 4rem;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--brand) 0%, #1e4f35 100%);
+  color: white;
+  border-radius: 18px;
+  padding: 1.4rem;
+  box-shadow: 0 20px 40px rgba(20, 32, 25, 0.2);
+}
+
+.hero p {
+  max-width: 70ch;
+}
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+button {
+  border: 0;
+  background: #f8e8ae;
+  color: #2f2a13;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.news-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.filters input,
+.filters select {
+  padding: 0.45rem;
+  border-radius: 8px;
+  border: 1px solid #bfd2c4;
+}
+
+.filters .field-invalid {
+  border-color: #cc3d2f;
+  background: #fff2f0;
+}
+
+.field-error {
+  min-width: 180px;
+  color: #b52314;
+  font-size: 0.82rem;
+}
+
+#search-filter {
+  min-width: 220px;
+}
+
+.exports {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+.exports a {
+  color: #18432f;
+  font-weight: 700;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+#page-status {
+  color: #415248;
+  font-weight: 600;
+}
+
+.settings-panel {
+  margin-top: 2rem;
+  background: #fff8ea;
+  border: 1px solid #e8dcc2;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.settings-status {
+  color: #30483a;
+  font-weight: 600;
+  margin-top: 0.4rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid #eadfc8;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.meta {
+  color: #5f6c61;
+  font-size: 0.9rem;
+}
+
+.summary {
+  white-space: pre-wrap;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+  background: var(--brand-soft);
+  border-radius: 10px;
+  padding: 0.7rem;
+}
+
+@media (max-width: 700px) {
+  .page {
+    width: 94vw;
+  }
+
+  .hero {
+    padding: 1rem;
+  }
+}

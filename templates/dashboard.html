@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jornal Nutri</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <h1>Jornal Nutri</h1>
+        <p>Noticias coletadas, traduzidas para portugues e resumidas em ate 30 linhas.</p>
+        <div class="actions">
+          <button id="collect-btn">Coletar agora</button>
+          <button id="newsletter-btn">Gerar newsletter</button>
+        </div>
+        <p id="collect-status"></p>
+      </header>
+
+      <section>
+        <h2>Ultimas noticias</h2>
+        <div class="filters">
+          <label for="search-filter">Busca</label>
+          <input id="search-filter" type="text" placeholder="titulo, conteudo, resumo" />
+
+          <label for="theme-filter">Tema</label>
+          <select id="theme-filter">
+            <option value="">Todos</option>
+            <option value="clinica">Clinica</option>
+            <option value="esportiva">Esportiva</option>
+            <option value="emagrecimento">Emagrecimento</option>
+            <option value="geral">Geral</option>
+          </select>
+
+          <label for="min-score-filter">Score minimo</label>
+          <input id="min-score-filter" type="number" min="0" max="100" value="0" />
+          <button id="apply-filter-btn">Aplicar filtros</button>
+        </div>
+
+        <div class="exports">
+          <a id="export-csv" href="/export/csv">Exportar CSV</a>
+          <a id="export-xlsx" href="/export/xlsx">Exportar Excel</a>
+        </div>
+
+        <div class="pagination">
+          <button id="prev-page-btn">Pagina anterior</button>
+          <span id="page-status">Pagina 1</span>
+          <button id="next-page-btn">Proxima pagina</button>
+        </div>
+
+        <div id="news-list" class="news-list"></div>
+      </section>
+
+      <section class="settings-panel">
+        <h2>Configuracoes</h2>
+        <div class="filters">
+          <label for="timezone-input">Timezone</label>
+          <input id="timezone-input" type="text" placeholder="America/Sao_Paulo" />
+          <span id="timezone-error" class="field-error"></span>
+
+          <label for="newsletter-hour-input">Hora newsletter</label>
+          <input id="newsletter-hour-input" type="number" min="0" max="23" />
+          <span id="hour-error" class="field-error"></span>
+
+          <label for="newsletter-minute-input">Minuto newsletter</label>
+          <input id="newsletter-minute-input" type="number" min="0" max="59" />
+          <span id="minute-error" class="field-error"></span>
+
+          <label for="newsletter-min-score-input">Score minimo newsletter</label>
+          <input id="newsletter-min-score-input" type="number" min="0" max="100" />
+          <span id="score-error" class="field-error"></span>
+
+          <button id="save-settings-btn">Salvar configuracoes</button>
+          <button id="reset-settings-btn" type="button">Restaurar padrao</button>
+        </div>
+        <p id="settings-status" class="settings-status"></p>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
