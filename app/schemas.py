@@ -40,7 +40,7 @@ class ProcessedNewsItem(BaseModel):
     source: str
     source_language: str
     target_language: str = "pt"
-    summary_max_lines: int = 30
+    summary_max_lines: int = 20
 
 
 class StoredNewsItem(BaseModel):

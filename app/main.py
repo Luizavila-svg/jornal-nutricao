@@ -138,7 +138,11 @@ def process_news_item(payload: NewsItem) -> ProcessedNewsItem:
     except TranslationError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
-    summary = summarize_text_preserving_graphics(translated_content, max_lines=30)
+    summary = summarize_text_preserving_graphics(
+        translated_content,
+        max_lines=20,
+        min_lines=15,
+    )
     theme, relevance_score = classify_and_score(translated_title, translated_content)
 
     return ProcessedNewsItem(
@@ -178,7 +182,11 @@ def perform_collection() -> tuple[int, int, int]:
             except TranslationError:
                 continue
 
-            summary = summarize_text_preserving_graphics(translated_content, max_lines=30)
+            summary = summarize_text_preserving_graphics(
+                translated_content,
+                max_lines=20,
+                min_lines=15,
+            )
             theme, relevance_score = classify_and_score(translated_title, translated_content)
             saved = upsert_news(
                 {

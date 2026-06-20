@@ -25,12 +25,13 @@ def test_health_endpoint() -> None:
     assert response.json() == {"status": "ok"}
 
 
-def test_summarizer_limits_to_30_lines() -> None:
+def test_summarizer_limits_to_20_lines() -> None:
     content = "\n".join([f"Linha {i}." for i in range(1, 70)])
 
-    summary = summarize_text_preserving_graphics(content, max_lines=30)
+    summary = summarize_text_preserving_graphics(content, max_lines=20, min_lines=15)
 
-    assert len(summary.splitlines()) <= 30
+    assert len(summary.splitlines()) <= 20
+    assert len(summary.splitlines()) >= 15
 
 
 def test_summarizer_preserves_mermaid_and_image() -> None:
@@ -48,7 +49,7 @@ A[Ingestao] --> B[Digestao]
 Terceira frase.
 """.strip()
 
-    summary = summarize_text_preserving_graphics(content, max_lines=30)
+    summary = summarize_text_preserving_graphics(content, max_lines=20, min_lines=15)
 
     assert "```mermaid" in summary
     assert "![grafico](https://example.com/grafico.png)" in summary

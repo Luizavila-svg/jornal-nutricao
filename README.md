@@ -5,7 +5,7 @@ Projeto reiniciado do zero para coleta e publicação de notícias da área de n
 ## Regras ativas do processamento
 
 - Todo texto recebido é traduzido para português.
-- O conteúdo é resumido em no máximo 30 linhas.
+- O conteúdo é resumido com foco nos dados mais relevantes, em geral entre 15 e 20 linhas (quando houver conteúdo suficiente).
 - Blocos gráficos são preservados no resumo (ex.: markdown de imagem e blocos `mermaid`).
 - Classificação automática por tema: `clinica`, `esportiva`, `emagrecimento` ou `geral`.
 - Score de relevância calculado em escala de 0 a 100.
@@ -15,7 +15,7 @@ Projeto reiniciado do zero para coleta e publicação de notícias da área de n
 - `GET /health`: verificação de saúde da aplicação.
 - `GET /`: dashboard web com botão de coleta e listagem.
 - `POST /translate`: traduz um texto para português.
-- `POST /news/process`: recebe uma notícia, traduz título e conteúdo para português e retorna resumo com até 30 linhas.
+- `POST /news/process`: recebe uma notícia, traduz título e conteúdo para português e retorna resumo priorizando dados relevantes (alvo entre 15 e 20 linhas).
 - `POST /collect`: coleta feeds RSS/Google News, traduz, resume e salva no SQLite.
 - `GET /api/news`: lista notícias salvas com filtros opcionais por tema e score.
 - `GET /api/news/count`: retorna total de notícias considerando os mesmos filtros.
