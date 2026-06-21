@@ -23,6 +23,15 @@ def get_feed_urls() -> list[str]:
     return [item for item in parsed if item]
 
 
+def get_max_entries_per_feed() -> int:
+    raw = os.getenv("JORNAL_NUTRI_MAX_ENTRIES_PER_FEED", "15").strip()
+    try:
+        value = int(raw)
+    except ValueError:
+        return 15
+    return max(1, min(value, 100))
+
+
 def get_newsletter_timezone() -> str:
     return os.getenv("JORNAL_NUTRI_TIMEZONE", "America/Sao_Paulo").strip()
 

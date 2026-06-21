@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from openpyxl import Workbook
 
 from app.collector import fetch_feed_entries
-from app.config import get_feed_urls
+from app.config import get_feed_urls, get_max_entries_per_feed
 from app.db import count_news, init_db, list_news, upsert_news
 from app.newsletter import write_daily_newsletter
 from app.notifier import notify_newsletter_generated
@@ -173,6 +173,7 @@ def collect_news() -> CollectResponse:
 
 def perform_collection() -> tuple[int, int, int]:
     feed_urls = get_feed_urls()
+    max_entries_per_feed = get_max_entries_per_feed()
     entries_found = 0
     entries_saved = 0
 
@@ -183,12 +184,22 @@ def perform_collection() -> tuple[int, int, int]:
             print(f"[collect] feed_error url={feed_url} error={exc!r}")
             continue
 
-        entries_found += len(entries)
+        selected_entries = entries[:max_entries_per_feed]
+        entries_found += len(selected_entries)
 
-        for entry in entries:
+        for entry in selected_entries:
             try:
-                translated_title = translate_to_portuguese(entry["title"], "auto")
-                translated_content = translate_to_portuguese(entry["content"], "auto")
+                translated_title = entry["title"]
+                translated_content = entry["content"]
+                target_language = "orig"
+
+                try:
+                    translated_title = translate_to_portuguese(entry["title"], "auto")
+                    translated_content = translate_to_portuguese(entry["content"], "auto")
+                    target_language = "pt"
+                except TranslationError:
+                    pass
+
                 summary = summarize_text_preserving_graphics(
                     translated_content,
                     max_lines=20,
@@ -205,7 +216,7 @@ def perform_collection() -> tuple[int, int, int]:
                         "theme": theme,
                         "relevance_score": relevance_score,
                         "source_language": "auto",
-                        "target_language": "pt",
+                        "target_language": target_language,
                         "published_at": entry.get("published_at"),
                     }
                 )
