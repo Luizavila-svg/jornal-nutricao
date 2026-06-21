@@ -108,7 +108,20 @@ async function runCollect() {
 
   try {
     const response = await fetch("/collect", { method: "POST" });
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const detail = typeof data.detail === "string" ? data.detail : "erro desconhecido";
+      statusNode.textContent = `Falha na coleta (${response.status}): ${detail}`;
+      return;
+    }
+    if (
+      typeof data.feeds_checked !== "number" ||
+      typeof data.entries_found !== "number" ||
+      typeof data.entries_saved !== "number"
+    ) {
+      statusNode.textContent = "Falha na coleta: resposta inesperada da API.";
+      return;
+    }
     statusNode.textContent = `Feeds: ${data.feeds_checked} | Encontradas: ${data.entries_found} | Salvas: ${data.entries_saved}`;
     await loadNews();
   } catch (_error) {
@@ -124,7 +137,16 @@ async function runNewsletter() {
 
   try {
     const response = await fetch("/newsletter/run", { method: "POST" });
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const detail = typeof data.detail === "string" ? data.detail : "erro desconhecido";
+      statusNode.textContent = `Falha ao gerar newsletter (${response.status}): ${detail}`;
+      return;
+    }
+    if (typeof data.generated_items !== "number" || typeof data.file_path !== "string") {
+      statusNode.textContent = "Falha ao gerar newsletter: resposta inesperada da API.";
+      return;
+    }
     statusNode.textContent = `Newsletter gerada com ${data.generated_items} itens em ${data.file_path}`;
   } catch (_error) {
     statusNode.textContent = "Falha ao gerar newsletter.";
