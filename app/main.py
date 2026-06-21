@@ -172,38 +172,45 @@ def perform_collection() -> tuple[int, int, int]:
     entries_saved = 0
 
     for feed_url in feed_urls:
-        entries = fetch_feed_entries(feed_url)
+        try:
+            entries = fetch_feed_entries(feed_url)
+        except Exception as exc:
+            print(f"[collect] feed_error url={feed_url} error={exc!r}")
+            continue
+
         entries_found += len(entries)
 
         for entry in entries:
             try:
                 translated_title = translate_to_portuguese(entry["title"], "auto")
                 translated_content = translate_to_portuguese(entry["content"], "auto")
-            except TranslationError:
+                summary = summarize_text_preserving_graphics(
+                    translated_content,
+                    max_lines=20,
+                    min_lines=15,
+                )
+                theme, relevance_score = classify_and_score(translated_title, translated_content)
+                saved = upsert_news(
+                    {
+                        "source": entry["source"],
+                        "url": entry["url"],
+                        "title": translated_title,
+                        "content": translated_content,
+                        "summary": summary,
+                        "theme": theme,
+                        "relevance_score": relevance_score,
+                        "source_language": "auto",
+                        "target_language": "pt",
+                        "published_at": entry.get("published_at"),
+                    }
+                )
+                if saved:
+                    entries_saved += 1
+            except Exception as exc:
+                print(
+                    f"[collect] entry_error url={entry.get('url')} title={entry.get('title')} error={exc!r}"
+                )
                 continue
-
-            summary = summarize_text_preserving_graphics(
-                translated_content,
-                max_lines=20,
-                min_lines=15,
-            )
-            theme, relevance_score = classify_and_score(translated_title, translated_content)
-            saved = upsert_news(
-                {
-                    "source": entry["source"],
-                    "url": entry["url"],
-                    "title": translated_title,
-                    "content": translated_content,
-                    "summary": summary,
-                    "theme": theme,
-                    "relevance_score": relevance_score,
-                    "source_language": "auto",
-                    "target_language": "pt",
-                    "published_at": entry.get("published_at"),
-                }
-            )
-            if saved:
-                entries_saved += 1
 
     return len(feed_urls), entries_found, entries_saved
 
