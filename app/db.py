@@ -165,3 +165,59 @@ def count_news(theme: Optional[str] = None, min_score: Optional[int] = None, sea
         return int(row[0]) if row else 0
     finally:
         conn.close()
+
+
+def list_source_metrics(
+    min_score: Optional[int] = None,
+    search: Optional[str] = None,
+) -> list[dict[str, Any]]:
+    init_db()
+    conn = _connect()
+    try:
+        conn.row_factory = sqlite3.Row
+
+        query = """
+            SELECT
+                source,
+                COUNT(*) AS total,
+                AVG(relevance_score) AS avg_relevance_score,
+                MAX(collected_at) AS last_collected_at,
+                SUM(CASE WHEN target_language = 'pt' THEN 1 ELSE 0 END) AS translated_items,
+                SUM(CASE WHEN target_language = 'orig' THEN 1 ELSE 0 END) AS untranslated_items
+            FROM news
+        """
+        conditions: list[str] = []
+        values: list[Any] = []
+
+        if min_score is not None:
+            conditions.append("relevance_score >= ?")
+            values.append(min_score)
+        if search:
+            conditions.append("(title LIKE ? OR content LIKE ? OR summary LIKE ?)")
+            search_value = f"%{search}%"
+            values.extend([search_value, search_value, search_value])
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += """
+            GROUP BY source
+            ORDER BY total DESC, avg_relevance_score DESC, source ASC
+        """
+
+        rows = conn.execute(query, tuple(values)).fetchall()
+        payload: list[dict[str, Any]] = []
+        for row in rows:
+            payload.append(
+                {
+                    "source": row["source"],
+                    "total": int(row["total"]),
+                    "avg_relevance_score": int(round(float(row["avg_relevance_score"] or 0))),
+                    "last_collected_at": row["last_collected_at"],
+                    "translated_items": int(row["translated_items"] or 0),
+                    "untranslated_items": int(row["untranslated_items"] or 0),
+                }
+            )
+        return payload
+    finally:
+        conn.close()

@@ -12,7 +12,7 @@ from openpyxl import Workbook
 
 from app.collector import fetch_feed_entries
 from app.config import get_feed_urls, get_max_entries_per_feed
-from app.db import count_news, init_db, list_news, upsert_news
+from app.db import count_news, init_db, list_news, list_source_metrics, upsert_news
 from app.newsletter import write_daily_newsletter
 from app.notifier import notify_newsletter_generated
 from app.scoring import classify_and_score
@@ -251,6 +251,15 @@ def get_news_count(
 ) -> dict[str, int]:
     total = count_news(theme=theme, min_score=min_score, search=q)
     return {"total": total}
+
+
+@app.get("/api/news/sources")
+def get_news_sources_metrics(
+    min_score: Optional[int] = Query(default=None, ge=0, le=100),
+    q: Optional[str] = None,
+) -> dict[str, list[dict[str, object]]]:
+    metrics = list_source_metrics(min_score=min_score, search=q)
+    return {"sources": metrics}
 
 
 @app.get("/export/csv")

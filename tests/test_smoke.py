@@ -196,6 +196,64 @@ def test_news_pagination_search_and_count(monkeypatch) -> None:
     assert page1.json()[0]["url"] != page2.json()[0]["url"]
 
 
+def test_news_source_metrics_endpoint(monkeypatch) -> None:
+    _clean_db_file()
+    client = TestClient(app)
+
+    monkeypatch.setattr(
+        "app.main.get_feed_urls",
+        lambda: ["https://fake.feed/rss", "https://fake.feed2/rss"],
+    )
+    monkeypatch.setattr("app.collector._extract_full_article_text", lambda _url: "")
+
+    def _fake_fetch(url: str) -> list[dict[str, str]]:
+        if "feed2" in url:
+            return [
+                {
+                    "source": "Source B",
+                    "url": "https://example.com/source-b-1",
+                    "title": "Sports creatine update",
+                    "content": "Athlete outcomes in controlled trial.",
+                    "published_at": "Sat, 20 Jun 2026 12:10:00 GMT",
+                }
+            ]
+
+        return [
+            {
+                "source": "Source A",
+                "url": "https://example.com/source-a-1",
+                "title": "Clinical nutrition guideline",
+                "content": "Strong evidence for patient nutrition.",
+                "published_at": "Sat, 20 Jun 2026 12:00:00 GMT",
+            },
+            {
+                "source": "Source A",
+                "url": "https://example.com/source-a-2",
+                "title": "Whey protein review",
+                "content": "Meta-analysis and safety notes.",
+                "published_at": "Sat, 20 Jun 2026 12:05:00 GMT",
+            },
+        ]
+
+    monkeypatch.setattr("app.main.fetch_feed_entries", _fake_fetch)
+    monkeypatch.setattr("app.main.translate_to_portuguese", lambda text, _lang: f"PT: {text}")
+
+    collect_response = client.post("/collect")
+    assert collect_response.status_code == 200
+
+    metrics_response = client.get("/api/news/sources")
+    assert metrics_response.status_code == 200
+    payload = metrics_response.json()["sources"]
+    assert len(payload) >= 2
+
+    first = payload[0]
+    assert first["source"] in {"Source A", "Source B"}
+    assert first["total"] >= 1
+    assert 0 <= first["avg_relevance_score"] <= 100
+    assert "translated_items" in first
+    assert "untranslated_items" in first
+
+
 def test_settings_get_and_update() -> None:
     _clean_db_file()
     client = TestClient(app)
