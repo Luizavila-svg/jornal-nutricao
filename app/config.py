@@ -8,9 +8,9 @@ DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "jornal_nutri.db"
 
 DEFAULT_FEEDS = [
-    "https://news.google.com/rss/search?q=nutrition",
-    "https://news.google.com/rss/search?q=dietetics",
     "https://www.sciencedaily.com/rss/health_medicine/nutrition.xml",
+    "https://www.hsph.harvard.edu/nutritionsource/feed/",
+    "https://rss.sciencedirect.com/publication/science/09552863",
 ]
 
 
