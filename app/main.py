@@ -109,6 +109,11 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/api/feeds")
+def get_active_feeds() -> dict[str, list[str]]:
+    return {"feeds": get_feed_urls()}
+
+
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("dashboard.html", {"request": request})
