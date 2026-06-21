@@ -22,6 +22,7 @@ const timezoneErrorNode = document.getElementById("timezone-error");
 const hourErrorNode = document.getElementById("hour-error");
 const minuteErrorNode = document.getElementById("minute-error");
 const scoreErrorNode = document.getElementById("score-error");
+const sourcesTableBody = document.getElementById("sources-table-body");
 
 const PAGE_SIZE = 10;
 let currentOffset = 0;
@@ -58,6 +59,66 @@ function refreshExportLinks() {
   exportXlsxLink.href = query ? `/export/xlsx?${query}` : "/export/xlsx";
 }
 
+function currentSourceMetricsParams() {
+  const params = new URLSearchParams();
+  const searchTerm = searchFilter.value.trim();
+  const minScore = minScoreFilter.value.trim();
+
+  if (minScore && Number(minScore) > 0) {
+    params.set("min_score", minScore);
+  }
+  if (searchTerm) {
+    params.set("q", searchTerm);
+  }
+  return params;
+}
+
+function renderSourcesMetrics(sources) {
+  if (!sourcesTableBody) {
+    return;
+  }
+
+  if (!Array.isArray(sources) || sources.length === 0) {
+    sourcesTableBody.innerHTML = '<tr><td colspan="6">Nenhuma metrica disponivel.</td></tr>';
+    return;
+  }
+
+  sourcesTableBody.innerHTML = "";
+  for (const item of sources) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.source || "n/a"}</td>
+      <td>${Number(item.total || 0)}</td>
+      <td>${Number(item.avg_relevance_score || 0)}</td>
+      <td>${Number(item.translated_items || 0)}</td>
+      <td>${Number(item.untranslated_items || 0)}</td>
+      <td>${item.last_collected_at || "n/a"}</td>
+    `;
+    sourcesTableBody.appendChild(row);
+  }
+}
+
+async function loadSourcesMetrics() {
+  if (!sourcesTableBody) {
+    return;
+  }
+
+  sourcesTableBody.innerHTML = '<tr><td colspan="6">Carregando metricas...</td></tr>';
+  try {
+    const params = currentSourceMetricsParams();
+    const response = await fetch(`/api/news/sources?${params.toString()}`);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const detail = typeof data.detail === "string" ? data.detail : "erro desconhecido";
+      sourcesTableBody.innerHTML = `<tr><td colspan="6">Falha ao carregar metricas (${response.status}): ${detail}</td></tr>`;
+      return;
+    }
+    renderSourcesMetrics(data.sources);
+  } catch (_error) {
+    sourcesTableBody.innerHTML = '<tr><td colspan="6">Falha ao carregar metricas.</td></tr>';
+  }
+}
+
 async function loadNews() {
   const params = currentFilterParams();
   const response = await fetch(`/api/news?${params.toString()}`);
@@ -72,6 +133,7 @@ async function loadNews() {
 
   refreshExportLinks();
   refreshPagination();
+  await loadSourcesMetrics();
 
   newsListNode.innerHTML = "";
   if (!Array.isArray(news) || news.length === 0) {

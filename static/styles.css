@@ -120,6 +120,50 @@ button:disabled {
   padding: 1rem;
 }
 
+.sources-panel {
+  margin-top: 2rem;
+  background: #f5fbf7;
+  border: 1px solid #d6e8db;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.sources-help {
+  margin-top: 0.2rem;
+  color: #4a6254;
+}
+
+.sources-table-wrap {
+  overflow-x: auto;
+}
+
+.sources-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #d8e7dc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sources-table th,
+.sources-table td {
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid #e4efe8;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sources-table th {
+  background: #e9f4ee;
+  color: #264434;
+  font-size: 0.92rem;
+}
+
+.sources-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .settings-status {
   color: #30483a;
   font-weight: 600;
